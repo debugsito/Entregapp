@@ -1,5 +1,6 @@
 package com.example.entregapp.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.entregapp.MenuActivity
+import com.example.entregapp.ProductoRegistrarActivity
+import com.example.entregapp.R
+import com.example.entregapp.adapters.ProductoAdapter
 import com.example.entregapp.databinding.FragmentHomeBinding
+import com.example.entregapp.models.ProductoModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeFragment : Fragment() {
 
@@ -22,17 +33,47 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+        val view: View =  inflater.inflate(R.layout.fragment_home, container, false)
+        val rvProyectos: RecyclerView = view.findViewById(R.id.rvProductos)
+        val db = FirebaseFirestore.getInstance()
+        var lstProyectos: List<ProductoModel>
+        val userModel = MySharedPreferences.getUserModel()
+        db.collection("products")
+            .addSnapshotListener{snap,e->
+                if(e!=null){
+                    Snackbar
+                        .make(view
+                            ,"Error al obtener la colección"
+                            , Snackbar.LENGTH_LONG).show()
+                    return@addSnapshotListener
+                }
+                lstProyectos = snap!!.documents.map { documentSnapshot ->
+                    ProductoModel(
+                        documentSnapshot.id,
+                        documentSnapshot["name"].toString(),
+                        documentSnapshot["description"].toString(),
+                        documentSnapshot["price"].toString().toFloat(),
+                        documentSnapshot["stock"].toString().toFloat(),
+                        documentSnapshot["user_uid"].toString(),
+                    )
+                }
+                val adapter = ProductoAdapter(lstProyectos)
+                rvProyectos.adapter = adapter
+                rvProyectos.layoutManager = LinearLayoutManager(requireContext())
+                adapter.setOnItemClickListener(object : ProductoAdapter.OnItemClickListener {
+                    override fun onItemClick(producto: ProductoModel) {
+                        //lo que sea xd
+                    }
+                })
+            }
+        val fabAgregar: FloatingActionButton = view.findViewById(R.id.fabAgregarProducto)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        // Manejar clics en el botón flotante
+        fabAgregar.setOnClickListener {
+            val intent = Intent(activity, ProductoRegistrarActivity::class.java)
+            startActivity(intent)
         }
-        return root
+        return view
     }
 
     override fun onDestroyView() {
