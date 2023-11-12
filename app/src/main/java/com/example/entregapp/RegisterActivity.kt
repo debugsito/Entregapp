@@ -28,7 +28,7 @@ class RegisterActivity : AppCompatActivity() {
         val etEmailLogin: EditText = findViewById(R.id.etEmailLogin)
         val etPasswordLogin: EditText = findViewById(R.id.etPasswordLogin)
         val rgUser: RadioGroup = findViewById(R.id.rgTipoUser)
-        val btnRegister: Button = findViewById(R.id.btnRegister)
+        val btnRegister: Button = findViewById(R.id.btnLogin)
 
         var tipoUser = ""
         rgUser.setOnCheckedChangeListener { group, checkedId ->
