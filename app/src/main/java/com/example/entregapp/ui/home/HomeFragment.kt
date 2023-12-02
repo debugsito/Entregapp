@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.entregapp.MenuActivity
+import com.example.entregapp.PedidoActivity
 import com.example.entregapp.ProductoRegistrarActivity
 import com.example.entregapp.R
 import com.example.entregapp.adapters.ProductoAdapter
@@ -62,7 +63,9 @@ class HomeFragment : Fragment() {
                 rvProyectos.layoutManager = LinearLayoutManager(requireContext())
                 adapter.setOnItemClickListener(object : ProductoAdapter.OnItemClickListener {
                     override fun onItemClick(producto: ProductoModel) {
-                        //lo que sea xd
+                        val intent = Intent(context, PedidoActivity::class.java)
+                        intent.putExtra("PRODUCTO", producto)
+                        startActivity(intent)
                     }
                 })
             }
